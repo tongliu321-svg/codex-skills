@@ -1,0 +1,7 @@
+interface:
+  display_name: "专利交底书"
+  short_description: "专利挖掘、查新与交底书生成"
+  default_prompt: "Use $patent-disclosure-skill to mine patent points, search prior art, and draft a technical disclosure from the provided project materials."
+
+policy:
+  allow_implicit_invocation: true
