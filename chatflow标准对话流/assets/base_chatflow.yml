@@ -1,0 +1,430 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 测试对话流
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 100
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    search_enabled:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1766973791000-source-1766993081362-target
+      source: '1766973791000'
+      sourceHandle: source
+      target: '1766993081362'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1766973791000-source-1766993096560-target
+      source: '1766973791000'
+      sourceHandle: source
+      target: '1766993096560'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1766993081362-source-1766974297072-target
+      source: '1766993081362'
+      sourceHandle: source
+      target: '1766974297072'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 1766974297072-source-1766998263587-target
+      source: '1766974297072'
+      sourceHandle: source
+      target: '1766998263587'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 1766992729292-source-1766998263587-target
+      source: '1766992729292'
+      sourceHandle: source
+      target: '1766998263587'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: variable-aggregator
+        targetType: answer
+      id: 1766998263587-source-1766998332481-target
+      source: '1766998263587'
+      sourceHandle: source
+      target: '1766998332481'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: parameter-extractor
+      id: 1766973791000-source-1766998518692-target
+      source: '1766973791000'
+      sourceHandle: source
+      target: '1766998518692'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: knowledge-retrieval
+        targetType: code
+      id: 1766993096560-source-1770192624566-target
+      source: '1766993096560'
+      sourceHandle: source
+      target: '1770192624566'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: llm
+      id: 1770192624566-source-1766992729292-target
+      source: '1770192624566'
+      sourceHandle: source
+      target: '1766992729292'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables: []
+      height: 62
+      id: '1766973791000'
+      position:
+        x: -156.85322360549728
+        y: 266.2621696790666
+      positionAbsolute:
+        x: -156.85322360549728
+        y: 266.2621696790666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1766993081362'
+          - result
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 9
+        model:
+          completion_params:
+            temperature: 0.4
+          mode: chat
+          name: qwen2.5-instruct
+          provider: xinference
+        prompt_template:
+        - id: c627407c-8536-4ebe-b80a-d25acd055405
+          role: system
+          text: 请根据用户输入{{#sys.query#}}，如果是实验相关的请根据{{#context#}}的相关内容进行搜索回答。回答的结构请按照，故障描述、问题分析、经验教训，三个结构输出
+        selected: false
+        title: 大模型
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 146
+      id: '1766974297072'
+      position:
+        x: 1149.174429150645
+        y: -42.058772625620946
+      positionAbsolute:
+        x: 1149.174429150645
+        y: -42.058772625620946
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1766993096560'
+          - result
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.4
+          mode: chat
+          name: qwen2.5-instruct
+          provider: xinference
+        prompt_template:
+        - id: cfbcd0e8-7cf0-4561-b7dd-6d4da8f30c8f
+          role: system
+          text: 请根据{{#sys.query#}}，从知识库{{#context#}}中检索相关内容进行总结输出
+        selected: false
+        title: 大模型 2
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 146
+      id: '1766992729292'
+      position:
+        x: 1443.8549439536873
+        y: 253.00825517861335
+      positionAbsolute:
+        x: 1443.8549439536873
+        y: 253.00825517861335
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        dataset_ids:
+        - 1720b514-bd40-4b0b-900f-1ed9b465fbff
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          reranking_model:
+            model: bge-reranker-v2-m3
+            provider: xinference
+          top_k: 4
+        query_variable_selector:
+        - '1766973791000'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: '121'
+        type: knowledge-retrieval
+      height: 322
+      id: '1766993081362'
+      position:
+        x: 512.8874090212032
+        y: -168.60974797762339
+      positionAbsolute:
+        x: 512.8874090212032
+        y: -168.60974797762339
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        dataset_ids:
+        - 869ba314-4ec4-4f72-980c-3341d597c3cf
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: reranking_model
+          reranking_model:
+            model: bge-reranker-v2-m3
+            provider: xinference
+          top_k: 4
+        query_variable_selector:
+        - '1766973791000'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: '120'
+        type: knowledge-retrieval
+      height: 322
+      id: '1766993096560'
+      position:
+        x: 512.8874090212032
+        y: 232.98872499384498
+      positionAbsolute:
+        x: 512.8874090212032
+        y: 232.98872499384498
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        desc: ''
+        output_type: string
+        selected: false
+        title: 变量聚合
+        type: variable-aggregator
+        variables:
+        - - '1766992729292'
+          - text
+        - - '1766974297072'
+          - text
+      height: 66
+      id: '1766998263587'
+      position:
+        x: 1987.099324759706
+        y: 76.58517720663902
+      positionAbsolute:
+        x: 1987.099324759706
+        y: 76.58517720663902
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        answer: '{{#1766998263587.output#}}'
+        desc: ''
+        selected: false
+        title: 直接回答
+        type: answer
+        variables: []
+      height: 144
+      id: '1766998332481'
+      position:
+        x: 2429.099324759706
+        y: 76.58517720663902
+      positionAbsolute:
+        x: 2429.099324759706
+        y: 76.58517720663902
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        desc: ''
+        instruction: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5-instruct
+          provider: xinference
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 参数提取
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 106
+      id: '1766998518692'
+      position:
+        x: 512.8874090212032
+        y: 593.9887249938449
+      positionAbsolute:
+        x: 512.8874090212032
+        y: 593.9887249938449
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        code: "\ndef main(arg1: str, arg2: str) -> dict:\n    return {\n        \"\
+          result\": arg1 + arg2,\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: true
+        title: 代码
+        type: code
+        variables:
+        - value_selector: []
+          variable: arg1
+        - value_selector: []
+          variable: arg2
+      height: 230
+      id: '1770192624566'
+      position:
+        x: 1066.862593530625
+        y: 242.9108977460806
+      positionAbsolute:
+        x: 1066.862593530625
+        y: 242.9108977460806
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    viewport:
+      x: 444.7888286550599
+      y: 376.9446435603483
+      zoom: 0.7922865020331686

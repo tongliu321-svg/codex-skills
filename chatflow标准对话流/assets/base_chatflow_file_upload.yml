@@ -1,0 +1,257 @@
+app:
+  description: '文件上传并自动提取文本（模板）'
+  icon: 📎
+  icon_background: '#D1FAE5'
+  mode: advanced-chat
+  name: 文件上传对话流模板
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .DOC
+      - .DOCX
+      - .PDF
+      - .TXT
+      - .MD
+      - .PPT
+      - .PPTX
+      - .XLS
+      - .XLSX
+      - .CSV
+      - .JSON
+      - .YAML
+      - .YML
+      allowed_file_types:
+      - document
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: true
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: '请上传文档。我会先提取文本，再按你的需求进行处理。'
+    retriever_resource:
+      enabled: true
+    search_enabled:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 请基于上传文件进行总结
+    - 请从上传文件中抽取关键信息
+    - 请基于上传文件进行合规审查
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: document-extractor
+      id: start-source-doc-extractor-target
+      source: 'start'
+      sourceHandle: source
+      target: 'doc_extractor'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: llm
+      id: doc-extractor-source-llm-target
+      source: 'doc_extractor'
+      sourceHandle: source
+      target: 'llm_file_process'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: llm-source-answer-target
+      source: 'llm_file_process'
+      sourceHandle: source
+      target: 'answer'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - allowed_file_extensions:
+          - .DOC
+          - .DOCX
+          - .PDF
+          - .TXT
+          - .MD
+          - .PPT
+          - .PPTX
+          - .XLS
+          - .XLSX
+          - .CSV
+          - .JSON
+          - .YAML
+          - .YML
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: upload_file
+          max_length: 48
+          options: []
+          required: true
+          type: file
+          variable: upload_file
+      height: 62
+      id: 'start'
+      position:
+        x: -156.85322360549728
+        y: 266.2621696790666
+      positionAbsolute:
+        x: -156.85322360549728
+        y: 266.2621696790666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 文档提取器
+        type: document-extractor
+        variable_selector:
+        - 'start'
+        - upload_file
+      height: 94
+      id: 'doc_extractor'
+      position:
+        x: 249.14677639450272
+        y: 266.2621696790666
+      positionAbsolute:
+        x: 249.14677639450272
+        y: 266.2621696790666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - 'doc_extractor'
+          - text
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 8
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: qwen2.5-instruct
+          provider: xinference
+        prompt_template:
+        - id: file-template-system
+          role: system
+          text: |
+            你是企业文档智能助手。你必须只基于“文档提取文本”回答，不得编造文档中不存在的内容。
+
+            你会收到两段输入：
+            - 用户问题：{{#sys.query#}}
+            - 文档提取文本：{{#context#}}
+
+            要求：
+            - 若文档提取文本为空或明显不完整：先提示用户更换文件/补充文本，不要强行输出结论。
+            - 输出尽量结构化（表格/要点/JSON），便于复用。
+        - id: file-template-user
+          role: user
+          text: |
+            用户问题：
+            {{#sys.query#}}
+
+            文档提取文本：
+            {{#context#}}
+
+            请基于上述内容完成用户需求。
+        selected: false
+        title: 文件处理（模板）
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 170
+      id: 'llm_file_process'
+      position:
+        x: 743.174429150645
+        y: 200.2621696790666
+      positionAbsolute:
+        x: 743.174429150645
+        y: 200.2621696790666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    - data:
+        answer: '{{#llm_file_process.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回答
+        type: answer
+        variables: []
+      height: 144
+      id: 'answer'
+      position:
+        x: 1185.174429150645
+        y: 200.2621696790666
+      positionAbsolute:
+        x: 1185.174429150645
+        y: 200.2621696790666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 382
+    viewport:
+      x: 444.7888286550599
+      y: 376.9446435603483
+      zoom: 0.7922865020331686
+
