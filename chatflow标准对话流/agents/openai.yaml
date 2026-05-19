@@ -1,8 +1,8 @@
 interface:
   display_name: "chatflow标准对话流"
-  short_description: "业务需求转Dify/Omni对话流YML"
+  short_description: "生成并排查Dify Chatflow标准对话流YML"
   brand_color: "#0F766E"
-  default_prompt: "使用 $chatflow标准对话流 根据业务需求生成可导入的 Dify/Omni Chatflow yml，并将文件写到桌面。"
+  default_prompt: "使用 $chatflow标准对话流 根据业务需求生成或修复可导入的 Dify/Omni Chatflow yml，并将文件写到桌面。"
 
 policy:
   allow_implicit_invocation: true

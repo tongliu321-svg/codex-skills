@@ -21,7 +21,13 @@
 
 ### 文件上传（start 节点变量）
 
-当场景涉及上传文件时，`start.data.variables[]` 里需要声明 `type: file` 的变量（例如 `upload_file`），并且 `workflow.features.file_upload.enabled` 必须为 `true`。
+先看模板样例再决定文件来源，不要猜。
+
+- 如果当前模板明确采用 `start` 文件变量，就沿用该结构。
+- 如果是常规 chatflow 且样例里没有 `start` 文件变量，优先读 `sys.files`。
+- 不要为了“看起来像文件上传”而手工新增 `start` file 变量，除非同类样例已验证过。
+
+无论采用哪种来源，`workflow.features.file_upload.enabled` 都必须为 `true`。
 
 最小结构参考：[`base_chatflow_file_upload.yml`](../assets/base_chatflow_file_upload.yml)
 
@@ -29,10 +35,16 @@
 
 - DSL 类型键: `document-extractor`
 - 关键字段:
-  - `variable_selector`: 指向 `start` 里的文件变量，例如 `['start', 'upload_file']`
+  - `variable_selector`: 指向实际文件来源，例如 `['start', 'upload_file']` 或 `['sys', 'files']`
   - `is_array_file`: 单文件一般为 `false`
 - 下游引用:
   - `llm.data.context.variable_selector` 指向 `['doc_extractor', 'text']`
+
+### 多文件对比
+
+- 不要直接在模板里对 `File` 列表做 `length`、拼接或 JSON 化。
+- 先把文件拆成 A/B 两条独立链路，再分别提取文本。
+- 如果某个分支一直只读到第一份文件，优先删掉中间计数节点，改成直连提取器。
 
 ### 意图识别（UI: 意图识别）
 
