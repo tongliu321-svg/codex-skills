@@ -1,0 +1,8 @@
+interface:
+  display_name: "mcp部署包开发版"
+  short_description: "生成可直接交给开发同事的标准MCP部署包"
+  brand_color: "#0F766E"
+  default_prompt: "使用 $mcp部署包开发版 根据业务需求、工具定义和业务文件生成开发版MCP部署包，并将部署包写到桌面。"
+
+policy:
+  allow_implicit_invocation: true
