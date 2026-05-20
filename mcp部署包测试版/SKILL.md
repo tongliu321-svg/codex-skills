@@ -5,7 +5,7 @@ description: Generate Cherry-testable MCP deployment packages on Desktop, instal
 
 # MCP 部署包测试版
 
-根据业务需求、工具定义、业务逻辑和业务文件，生成一个支持 Cherry Studio 本地测试的 MCP 部署包，并在本机自动完成依赖安装、启动服务和输出 SSE URL。
+根据业务需求、工具定义、业务逻辑和业务文件，直接在桌面生成一个支持 Cherry Studio 本地测试的 MCP 部署包，并在本机自动完成依赖安装、启动服务和输出 SSE URL。
 
 ## 适用场景
 
@@ -13,6 +13,7 @@ description: Generate Cherry-testable MCP deployment packages on Desktop, instal
 - 需要自动安装依赖
 - 需要自动起 MCP 服务
 - 需要直接给出 Cherry 可配置的 `SSE` 类型和 URL
+- 用户明确调用 `$mcp部署包测试版`
 
 ## 先读哪些文件
 
@@ -29,12 +30,13 @@ description: Generate Cherry-testable MCP deployment packages on Desktop, instal
 5. 修正所有渲染后仍残留的入口或导入占位。
 6. 用 `scripts/validate_package.py` 做目录完整性检查。
 7. 对生成代码至少做一次 `py_compile` 语法检查。
-8. 在桌面部署包目录创建 `.venv`。
-9. 安装本地依赖；如 `ALL_PROXY` 导致 pip 失败，安装时应临时去掉 `ALL_PROXY`。
-10. 启动本地 MCP 服务。
-11. 若默认端口被占用，改用新的可用端口，不要中断。
-12. 探活 `/sse`，确认 `200 OK` 且 `content-type: text/event-stream`。
-13. 最终输出：
+8. 优先使用 `scripts/prepare_cherry_test.py` 完成本地测试准备和服务启动。
+9. 在桌面部署包目录创建 `.venv`。
+10. 安装本地依赖；如代理环境导致 pip 失败，先保留原环境尝试，失败后再自动去掉代理变量重试。
+11. 启动本地 MCP 服务。
+12. 若默认端口被占用，改用新的可用端口，不要中断。
+13. 探活 `/sse`，确认 `200 OK` 且 `content-type: text/event-stream`。
+14. 最终输出：
    - `SSE`
    - 实际可用的 URL
 
@@ -45,6 +47,7 @@ description: Generate Cherry-testable MCP deployment packages on Desktop, instal
 - 不要在依赖安装失败后直接结束，先检查是否是代理环境问题
 - 不要只生成包不测试
 - 不要输出未验证的 SSE URL
+- 用户调用这个 skill 时，不要停在说明层，必须把桌面包和可用 URL 一起给出
 
 ## 最终输出要求
 
@@ -54,6 +57,26 @@ description: Generate Cherry-testable MCP deployment packages on Desktop, instal
 - 可配置 URL：`http://127.0.0.1:<端口>/sse`
 
 如果服务因环境限制无法启动，也要明确说明原因。
+
+## 自动化脚本
+
+优先用下面的脚本完成本机测试收尾：
+
+```bash
+python3 scripts/prepare_cherry_test.py \
+  --root '/目标目录' \
+  --package-name 'python_package_name'
+```
+
+如果要从空目录直接引导出一个可测试骨架，也可以用：
+
+```bash
+python3 scripts/prepare_cherry_test.py \
+  --root '/目标目录' \
+  --bootstrap \
+  --business-name '业务名称' \
+  --package-name 'python_package_name'
+```
 
 ## 交付边界
 

@@ -2,7 +2,7 @@ interface:
   display_name: "mcp部署包测试版"
   short_description: "生成Cherry可测试的MCP部署包并输出SSE地址"
   brand_color: "#1D4ED8"
-  default_prompt: "使用 $mcp部署包测试版 根据业务需求生成可在Cherry Studio测试的MCP部署包，自动安装依赖、启动服务，并输出SSE类型及URL。"
+  default_prompt: "使用 $mcp部署包测试版 直接在桌面生成可在Cherry Studio测试的MCP部署包，自动安装依赖、启动服务，并输出已验证的SSE类型及URL。"
 
 policy:
   allow_implicit_invocation: true

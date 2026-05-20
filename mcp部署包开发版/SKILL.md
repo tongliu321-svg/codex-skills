@@ -5,13 +5,14 @@ description: Generate developer-ready MCP deployment packages from business requ
 
 # MCP 部署包开发版
 
-根据业务需求、工具定义、业务逻辑和业务文件，生成一个可直接交给开发同事部署的标准 MCP 部署包。
+根据业务需求、工具定义、业务逻辑和业务文件，直接在桌面生成一个可交给开发同事部署的标准 MCP 部署包。
 
 ## 适用场景
 
 - 需要在桌面生成一套交付开发同事的 MCP 部署包
 - 需要标准目录、启动脚本、环境变量模板、Docker、systemd、nginx
 - 不需要你本机自动安装依赖和自动起服务
+- 用户明确调用 `$mcp部署包开发版`
 
 ## 先读哪些文件
 
@@ -28,6 +29,7 @@ description: Generate developer-ready MCP deployment packages from business requ
 5. 更新部署说明、环境变量模板和部署资产。
 6. 用 `scripts/validate_package.py` 做目录完整性检查。
 7. 对生成代码至少做一次 `py_compile` 语法检查。
+8. 最终明确告诉用户桌面部署包目录。
 
 ## 必须遵守
 
@@ -36,6 +38,7 @@ description: Generate developer-ready MCP deployment packages from business requ
 - 不要省略工具定义、参数定义、返回格式定义
 - 不要把业务代码堆进部署骨架
 - 不要只输出代码片段，必须输出完整桌面部署包
+- 用户调用这个 skill 时，不要只讲方案，必须实际生成部署包
 
 ## 生成物要求
 
