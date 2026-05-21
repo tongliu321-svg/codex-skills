@@ -26,10 +26,12 @@ description: Generate developer-ready MCP deployment packages from business requ
 2. 用 `scripts/init_mcp_package.py` 在桌面生成标准脚手架。
 3. 用 `scripts/render_package.py` 渲染业务名称、包名、服务名、域名等占位符。
 4. 写入业务层代码和业务文件。
-5. 更新部署说明、环境变量模板和部署资产。
-6. 用 `scripts/validate_package.py` 做目录完整性检查。
-7. 对生成代码至少做一次 `py_compile` 语法检查。
-8. 最终明确告诉用户桌面部署包目录。
+5. 如果业务数据来自 Excel、CSV、数据库导出表、清单类文件，先完整读取全部数据，再构建内存索引或关联关系，不要按问一句扫一行的方式组织逻辑。
+6. 如果问题属于“几个阶段、多少条、有哪些任务、全部名单、阶段汇总、负责人汇总”这类统计或列表型问题，默认走全量汇总逻辑，不要只返回前几条命中结果。
+7. 更新部署说明、环境变量模板和部署资产。
+8. 用 `scripts/validate_package.py` 做目录完整性检查。
+9. 对生成代码至少做一次 `py_compile` 语法检查。
+10. 最终明确告诉用户桌面部署包目录。
 
 ## 必须遵守
 
@@ -38,6 +40,8 @@ description: Generate developer-ready MCP deployment packages from business requ
 - 不要省略工具定义、参数定义、返回格式定义
 - 不要把业务代码堆进部署骨架
 - 不要只输出代码片段，必须输出完整桌面部署包
+- 不要把结构化业务文件的原始逐行扫描过程直接暴露成最终回答
+- 不要给统计类、汇总类、列表类问题设置默认截断上限，除非用户明确要求只看前几条
 - 用户调用这个 skill 时，不要只讲方案，必须实际生成部署包
 
 ## 生成物要求
