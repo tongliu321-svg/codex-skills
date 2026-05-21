@@ -456,7 +456,11 @@ class WeChatPublisher:
         # 9. 图片适配微信
         html = re.sub(
             r'<img src="(.*?)"\s*(alt="[^"]*")?\s*/?>',
-            r'<section style="text-align:center;margin:12px 0;"><img src="\1" style="max-width:100%;height:auto;border-radius:4px;" /></section>',
+            r'<section style="margin:18px 0;">'
+            r'<section style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:14px;padding:10px 10px 6px;">'
+            r'<img src="\1" style="width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.08);" />'
+            r'</section>'
+            r'</section>',
             html
         )
         
