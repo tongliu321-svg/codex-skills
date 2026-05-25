@@ -1,0 +1,8 @@
+interface:
+  display_name: "应用部署腾讯云"
+  short_description: "将代码包一键部署到腾讯云并完成公网可用性验证"
+  brand_color: "#1D4ED8"
+  default_prompt: "使用 $应用部署腾讯云 将当前代码包部署到腾讯云服务器，生成 Linux 部署版副本，完成上传、systemd/nginx 配置与公网访问验证，并给出最终访问地址。"
+
+policy:
+  allow_implicit_invocation: true
