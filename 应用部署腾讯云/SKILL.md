@@ -56,6 +56,7 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 - 无域名时默认交付 `http://<public_ip>`
 - 有域名时自动升级为 `https://<domain>`
 - 部署完成后必须直接给访问地址
+- 每次部署都要生成可复用的部署状态记录，便于下次增量更新
 
 ## 输出要求
 
@@ -68,6 +69,7 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
   - 服务名
   - 访问地址
   - 根因说明（如果中间做过兼容改造或网络排障）
+  - 部署状态记录位置
 
 ## 标准工作流
 
@@ -227,6 +229,9 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 Ubuntu 常用依赖清单见：
 - [ubuntu_runtime_patterns.md](./references/ubuntu_runtime_patterns.md)
 
+部署状态记录规则见：
+- [deployment_state_persistence.md](./references/deployment_state_persistence.md)
+
 ### 8. 必做五层验证
 
 部署完成后，必须按顺序验证：
@@ -282,6 +287,45 @@ Ubuntu 常用依赖清单见：
 具体命令见：
 - [verification_and_network_debug.md](./references/verification_and_network_debug.md)
 
+### 10. 写入部署状态记录
+
+部署成功前，必须把本次部署的关键元数据写成状态文件，至少保留一份本地副本和一份服务器副本。
+
+最少字段：
+
+- `APP_NAME`
+- `PROJECT_TYPE`
+- `SERVER_HOST`
+- `SERVER_USER`
+- `DEPLOY_DIR`
+- `SERVICE_NAME`
+- `APP_PORT`
+- `PUBLIC_URL`
+- `DOMAIN`
+- `NGINX_CONF`
+- `SYSTEMD_UNIT`
+- `CORE_CHECK`
+- `LAST_DEPLOY_AT`
+- `LINUX_ADAPTATIONS`
+
+推荐位置：
+
+- 本地部署副本：
+  - `<deploy_copy>/DEPLOY_STATE.env`
+- 服务器：
+  - `<deploy_dir>/.codex-deploy-state.env`
+
+推荐直接复用：
+- [render_deploy_state.sh](./scripts/render_deploy_state.sh)
+
+如果用户下次给同一个应用的新代码包，先读取历史状态，再决定：
+
+- 是否沿用原服务名
+- 是否沿用原部署目录
+- 是否沿用原端口
+- 是否应该继续用 `http://IP`
+- 是否应直接恢复 `https://域名`
+
 ## 实施准则
 
 - 先保证“能打开”，再优化 HTTPS、域名、监控
@@ -300,11 +344,13 @@ Ubuntu 常用依赖清单见：
   - 实际公网地址
   - 是否做过 Linux 兼容改造
   - 是否做过云防火墙/安全组排障
+  - 本地和远端部署状态文件路径
 
 ## 二次部署原则
 
 如果用户第二次给你新代码包更新同一应用：
 
+- 先读取已有部署状态记录
 - 默认部署到原目录
 - 保留原服务名
 - 用新副本覆盖部署内容
@@ -331,11 +377,13 @@ Ubuntu 常用依赖清单见：
 - `references/project_type_routing.md`
 - `references/ubuntu_runtime_patterns.md`
 - `references/domain_and_https.md`
+- `references/deployment_state_persistence.md`
 - `references/verification_and_network_debug.md`
 - `references/acceptance_checklist.md`
 - `scripts/render_systemd.sh`
 - `scripts/render_nginx.sh`
 - `scripts/render_nginx_https.sh`
+- `scripts/render_deploy_state.sh`
 
 ## 使用方式
 

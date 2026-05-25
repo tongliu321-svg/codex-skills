@@ -9,6 +9,12 @@ curl -I http://127.0.0.1
 curl --noproxy '*' -I http://<public_ip>
 ```
 
+如果用户提供了域名并已完成 HTTPS，再补一层：
+
+```bash
+curl --noproxy '*' -I https://<domain>
+```
+
 ## 监听检查
 
 ```bash
@@ -42,3 +48,5 @@ sudo timeout 20 tcpdump -ni any port 80 -c 20
   - 查反代或上游应用
 - 如果应用本机端口不通：
   - 查 `systemd`、依赖、环境变量
+- 如果 `http://IP` 正常但 `https://domain` 不通：
+  - 查 DNS、证书、443 监听和安全组
