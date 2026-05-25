@@ -9,6 +9,7 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 
 目标不是只把代码传上去，而是完成一个可访问、可操作、可复查的部署闭环：
 
+- 识别项目类型（Python / Node.js / 纯静态站点）
 - 识别项目运行方式
 - 自动判断是否需要 Linux 兼容改造
 - 生成部署副本，不污染原代码
@@ -34,7 +35,8 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 
 - 本地代码包路径
 - 目标服务器：
-  - 公网 IP 或域名
+  - 公网 IP
+  - 域名（可选）
   - SSH 用户名
   - 登录方式：密码或私钥
 - 目标访问端口：
@@ -51,6 +53,8 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 - 自动复制一份“Linux 部署版”副本
 - 如果原项目已经是 Linux 可运行，也仍然优先使用副本部署
 - 如果拿到的代码不是 Linux 部署版，必须先自动改造，再部署
+- 无域名时默认交付 `http://<public_ip>`
+- 有域名时自动升级为 `https://<domain>`
 - 部署完成后必须直接给访问地址
 
 ## 输出要求
@@ -67,7 +71,28 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 
 ## 标准工作流
 
-### 1. 先判断项目能不能原样上 Linux
+### 1. 先识别项目类型
+
+优先按下面三类分流：
+
+- Python 服务
+  - 典型特征：`server.py`、`requirements.txt`、Flask/FastAPI/http.server
+- Node.js 服务或 SSR
+  - 典型特征：`package.json`、`next.config.*`、`vite.config.*`、`server.js`
+- 纯静态站点
+  - 典型特征：只有 `index.html`、`app.js`、`styles.css` 等静态资源，无常驻服务依赖
+
+如果不能立即判断，优先查：
+- `package.json`
+- `requirements.txt`
+- `pyproject.toml`
+- `server.py`
+- `index.html`
+
+项目类型分流见：
+- [project_type_routing.md](./references/project_type_routing.md)
+
+### 2. 再判断项目能不能原样上 Linux
 
 优先检查：
 
@@ -89,7 +114,7 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 具体检查清单见：
 - [linux_compatibility_checklist.md](./references/linux_compatibility_checklist.md)
 
-### 2. 创建部署副本
+### 3. 创建部署副本
 
 默认策略：
 
@@ -99,7 +124,7 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 3. 只在副本中修改
 4. 如果原项目缺少部署文件，在副本中补齐，不回写原项目
 
-### 3. 进行 Linux 兼容改造
+### 4. 进行 Linux 兼容改造
 
 优先做最少修改，只替换运行环境不兼容的部分，不要重写业务逻辑。
 
@@ -132,25 +157,28 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 
 如果存在这些风险，必须在部署副本里先修，再上线。
 
-### 4. 生成部署文件
+### 5. 生成部署文件
 
 部署副本里至少要有：
 
 - `start_server.sh`
-- `requirements.txt`
 - `systemd` 服务文件
 - `nginx` 站点配置
 - 部署说明
 
 推荐产物：
 
+- Python 项目：
+  - `requirements.txt`
 - `install_ubuntu.sh`
 - `DEPLOY.md`
 - `.env.example`
-- `report-judge-app.service`
+- `<service>.service`
 - `nginx-<app>.conf`
+- 有域名时：
+  - `nginx-<app>-https.conf`
 
-### 5. 上传服务器
+### 6. 上传服务器
 
 优先方式：
 
@@ -161,21 +189,45 @@ description: "将本地代码包一键部署到腾讯云轻量应用服务器或
 
 如果密码登录，需要接受多次认证提示，不要因为第一次 `ssh` 可登录就假设 `scp` 无需密码。
 
-### 6. 安装依赖并启动
+### 7. 安装依赖并启动
 
 推荐标准：
 
-- 安装系统依赖
-- 建立虚拟环境 `.venv`
-- 安装 Python 依赖
-- 写入 `systemd` 服务
-- `systemctl enable --now`
-- `nginx` 反代到本机应用端口
+- Python 项目：
+  - 安装系统依赖
+  - 建立虚拟环境 `.venv`
+  - 安装 Python 依赖
+  - 写入 `systemd` 服务
+  - `systemctl enable --now`
+  - `nginx` 反代到本机应用端口
+- Node.js 项目：
+  - 安装 Node.js 运行时
+  - `npm install` / `pnpm install`
+  - 如需构建则 `npm run build`
+  - `systemd` 启服务或常驻 `next start` / `node server.js`
+  - `nginx` 反代到本机 Node 端口
+- 纯静态站点：
+  - 不强制启动应用进程
+  - 直接由 `nginx` 提供静态目录
+  - 若有前端配置替换需求，先在本地副本完成
+
+域名/HTTPS 分流：
+
+- 无域名：
+  - 默认交付 `http://<public_ip>`
+  - 不因为缺域名阻塞部署
+- 有域名：
+  - 先确认 DNS 已解析到服务器公网 IP
+  - 再申请证书并升级到 `https://<domain>`
+  - 保留 `80 -> 443` 跳转
+
+域名与 HTTPS 路径见：
+- [domain_and_https.md](./references/domain_and_https.md)
 
 Ubuntu 常用依赖清单见：
 - [ubuntu_runtime_patterns.md](./references/ubuntu_runtime_patterns.md)
 
-### 7. 必做五层验证
+### 8. 必做五层验证
 
 部署完成后，必须按顺序验证：
 
@@ -186,7 +238,8 @@ Ubuntu 常用依赖清单见：
 3. 本机反代：
    - `curl -I http://127.0.0.1`
 4. 公网访问：
-   - 从本地 `curl --noproxy '*' -I http://<public_ip>`
+   - 无域名：从本地 `curl --noproxy '*' -I http://<public_ip>`
+   - 有域名：从本地 `curl --noproxy '*' -I https://<domain>`
 5. 最小可操作性验收：
    - 至少验证一个核心交互不是假通
    - 例如：
@@ -203,7 +256,7 @@ Ubuntu 常用依赖清单见：
 
 如果只验证到第 2 或第 3 层，不算完成；只验证首页 `200` 也不算完成。
 
-### 8. 公网打不开时的排障顺序
+### 9. 公网打不开时的排障顺序
 
 按这个顺序查，不要乱跳：
 
@@ -223,6 +276,8 @@ Ubuntu 常用依赖清单见：
   - 查应用进程和依赖
 - 如果首页正常但业务操作报“未上传/未登录/未初始化”：
   - 查前端状态写入顺序、浏览器能力依赖、接口路径和缓存版本
+- 如果域名 HTTPS 不通但 IP HTTP 正常：
+  - 查 DNS、证书签发、`nginx 443`、80/443 放行情况
 
 具体命令见：
 - [verification_and_network_debug.md](./references/verification_and_network_debug.md)
@@ -230,6 +285,8 @@ Ubuntu 常用依赖清单见：
 ## 实施准则
 
 - 先保证“能打开”，再优化 HTTPS、域名、监控
+- 没有域名时，不阻塞交付；默认给 `http://IP`
+- 有域名时，必须优先交付 `https://域名`
 - 不要假设本机代理环境可靠；公网验证时优先加 `--noproxy '*'`
 - 不要只看浏览器现象，要结合 `nginx access.log` 和 `tcpdump`
 - 遇到上传控件看起来正常、提交却报“未上传”时，检查：
@@ -262,6 +319,8 @@ Ubuntu 常用依赖清单见：
 - 本机端口正常
 - nginx 正常
 - 公网地址可访问
+- 无域名时已给出 `http://IP`
+- 有域名时已给出 `https://域名`
 - 至少一个核心业务操作可正常进行
 - 最终已把访问地址明确返回给用户
 
@@ -269,11 +328,14 @@ Ubuntu 常用依赖清单见：
 
 - `agents/openai.yaml`
 - `references/linux_compatibility_checklist.md`
+- `references/project_type_routing.md`
 - `references/ubuntu_runtime_patterns.md`
+- `references/domain_and_https.md`
 - `references/verification_and_network_debug.md`
 - `references/acceptance_checklist.md`
 - `scripts/render_systemd.sh`
 - `scripts/render_nginx.sh`
+- `scripts/render_nginx_https.sh`
 
 ## 使用方式
 
