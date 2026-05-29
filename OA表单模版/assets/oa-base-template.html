@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OA表单基础模板</title>
+  <style>
+    :root {
+      --line: #9fc3e7;
+      --line-strong: #6fa7dd;
+      --head: #dfeefa;
+      --head-2: #e9f3fc;
+      --text: #222;
+      --title: #111;
+      --muted: #6a7a89;
+      --page: #f5f8fb;
+      --white: #ffffff;
+      --warn: #ff0000;
+      --tool-blue: #63a7ee;
+      --tool-gray: #a7a7a7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Microsoft YaHei UI", Arial, sans-serif;
+    }
+
+    .page {
+      width: min(1160px, calc(100vw - 24px));
+      margin: 20px auto 32px;
+      background: var(--white);
+      padding: 6px 0 28px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--title);
+      margin: 10px 0 16px;
+      letter-spacing: 0.2px;
+    }
+
+    table.form {
+      width: min(1120px, 100%);
+      margin: 0 auto 10px;
+      border-collapse: collapse;
+      table-layout: auto;
+      font-size: 14px;
+    }
+
+    .form td,
+    .form th {
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      vertical-align: middle;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .label,
+    .section,
+    .form th {
+      background: var(--head);
+      font-weight: 700;
+    }
+
+    .label {
+      white-space: nowrap;
+    }
+
+    .section {
+      color: #22384d;
+    }
+
+    .ipt,
+    .sel,
+    .txt {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+      min-height: 24px;
+      padding: 0;
+      outline: none;
+    }
+
+    .ipt:focus,
+    .sel:focus,
+    .txt:focus {
+      background: #f7fbff;
+    }
+
+    .txt {
+      min-height: 108px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .txt.large {
+      min-height: 120px;
+    }
+
+    .req {
+      color: var(--warn);
+      margin-left: 4px;
+      font-weight: 700;
+    }
+
+    .readonly-field {
+      color: #1d3f6c;
+      font-weight: 700;
+      background: #f7fbff;
+    }
+
+    .check-row,
+    .radio-row {
+      display: flex;
+      align-items: center;
+      gap: 10px 18px;
+      flex-wrap: wrap;
+      min-height: 24px;
+    }
+
+    .check-row label,
+    .radio-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sub-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-bottom: none;
+      background: #fff;
+      padding: 2px 0 0;
+    }
+
+    .sub-head .name {
+      padding: 4px 8px 2px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #22384d;
+    }
+
+    .ops {
+      display: flex;
+      gap: 4px;
+      padding-right: 4px;
+    }
+
+    .op {
+      width: 18px;
+      height: 18px;
+      border-radius: 2px;
+      border: none;
+      font-size: 14px;
+      line-height: 18px;
+      color: #fff;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .op.add { background: var(--tool-blue); }
+    .op.remove,
+    .op.copy { background: var(--tool-gray); }
+
+    .right { text-align: right; }
+    .center { text-align: center; }
+
+    @media (max-width: 900px) {
+      .page {
+        width: 100%;
+        margin: 0;
+        padding: 10px 10px 30px;
+      }
+
+      .title { font-size: 18px; }
+      .form td,
+      .form th { font-size: 13px; padding: 5px 6px; }
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 8px 8px 24px; }
+      .title { font-size: 16px; margin-bottom: 8px; }
+      .form td,
+      .form th { font-size: 12px; }
+      .sub-head .name { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="title">OA表单基础模板</div>
+
+    <table class="form">
+      <tr>
+        <td class="label">项目名称<span class="req">*</span></td>
+        <td><input class="ipt" value=""></td>
+        <td class="label">客户名称</td>
+        <td><input class="ipt" value=""></td>
+      </tr>
+      <tr>
+        <td class="label">项目类别</td>
+        <td colspan="3">
+          <div class="radio-row">
+            <label><input type="radio" name="type"> 标准产品</label>
+            <label><input type="radio" name="type" checked> 轻量定制</label>
+            <label><input type="radio" name="type"> 可复制定制</label>
+            <label><input type="radio" name="type"> 其他</label>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="section" colspan="4">项目建设内容</td>
+      </tr>
+      <tr>
+        <td colspan="4"><textarea class="txt large"></textarea></td>
+      </tr>
+    </table>
+
+    <div class="sub-head">
+      <div class="name">动态子表</div>
+      <div class="ops">
+        <button class="op add" type="button" id="addRow">+</button>
+        <button class="op remove" type="button" id="removeRow">−</button>
+        <button class="op copy" type="button" id="copyRow">□</button>
+      </div>
+    </div>
+
+    <table class="form" id="detailTable">
+      <tbody>
+        <tr>
+          <td class="center" style="width:42px;"><input type="checkbox"></td>
+          <td><input class="ipt" value=""></td>
+          <td><input class="ipt right qty" value="1"></td>
+          <td><input class="ipt right price" value="0"></td>
+          <td><input class="ipt right readonly-field amount" value="0" readonly></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const tbody = document.querySelector('#detailTable tbody');
+
+    function calcRow(row) {
+      const qty = Number(row.querySelector('.qty')?.value || 0);
+      const price = Number(row.querySelector('.price')?.value || 0);
+      const amount = row.querySelector('.amount');
+      if (amount) amount.value = (qty * price).toFixed(2);
+    }
+
+    function bindRow(row) {
+      row.querySelectorAll('.qty, .price').forEach(el => {
+        el.addEventListener('input', () => calcRow(row));
+      });
+      calcRow(row);
+    }
+
+    function selectedRow() {
+      return [...tbody.querySelectorAll('tr')].find(row => row.querySelector('input[type="checkbox"]')?.checked);
+    }
+
+    document.getElementById('addRow').onclick = () => {
+      const row = tbody.rows[0].cloneNode(true);
+      row.querySelectorAll('input').forEach(el => {
+        if (el.type === 'checkbox') el.checked = false;
+        else if (el.classList.contains('qty')) el.value = '1';
+        else el.value = '0';
+      });
+      row.querySelector('.amount').value = '0';
+      tbody.appendChild(row);
+      bindRow(row);
+    };
+
+    document.getElementById('removeRow').onclick = () => {
+      const row = selectedRow();
+      if (row && tbody.rows.length > 1) row.remove();
+    };
+
+    document.getElementById('copyRow').onclick = () => {
+      const row = selectedRow();
+      if (!row) return;
+      const clone = row.cloneNode(true);
+      clone.querySelector('input[type="checkbox"]').checked = false;
+      tbody.appendChild(clone);
+      bindRow(clone);
+    };
+
+    [...tbody.querySelectorAll('tr')].forEach(bindRow);
+  </script>
+</body>
+</html>
